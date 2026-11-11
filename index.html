@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An Việt ERP</title>
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="An Việt ERP">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #1f2937; }
+  #ld { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 0 16px; text-align: center; }
+  #ld img { width: 96px; height: 96px; }
+  .sp { width: 28px; height: 28px; border: 3px solid #e5e7eb; border-top-color: #1d4ed8; border-radius: 50%; animation: r 0.9s linear infinite; }
+  @keyframes r { to { transform: rotate(360deg); } }
+  #msg { font-size: 15px; color: #4b5563; max-width: 340px; line-height: 1.5; }
+  button { font: inherit; padding: 10px 22px; border: 0; border-radius: 8px; background: #1d4ed8; color: #fff; }
+  @media (prefers-color-scheme: dark) { html, body { background: #000; color: #e5e7eb; } #msg { color: #9ca3af; } .sp { border-color: #333; border-top-color: #60a5fa; } }
+</style>
+</head>
+<body>
+<div id="ld">
+  <img src="icon-180.png" alt="">
+  <div class="sp" id="sp"></div>
+  <div id="msg">Đang mở An Việt ERP…</div>
+</div>
+<script>
+/*
+ * Trang mở An Việt ERP đặt ngoài script.google.com.
+ * Lý do: điện thoại đang đăng nhập tài khoản Google bị Google tự đổi link /macros/s/ thành
+ * /macros/u/0/s/ và báo "Không thể mở tệp". Trang này tải giao diện mới nhất từ máy chủ
+ * (không gửi cookie Google) rồi mọi lệnh đọc/ghi đi thẳng tới /exec — nên không bao giờ dính lỗi đó.
+ * Giao diện luôn là bản mới nhất trên máy chủ: trang này không cần cập nhật khi app nâng cấp.
+ */
+var EXEC = 'https://script.google.com/macros/s/AKfycbzdaglscn6gd_e3vR4qHzgBW6dvx6M_imvRnapG4mRmfhLxv5dUwRB2sKH7c8KdCtJw/exec';
+function fail() {
+  document.getElementById('sp').style.display = 'none';
+  document.getElementById('msg').innerHTML = 'Chưa kết nối được máy chủ. Kiểm tra mạng rồi thử lại.<br><br><button onclick="location.reload()">Thử lại</button>';
+}
+fetch(EXEC + '?raw=1', { credentials: 'omit', redirect: 'follow', cache: 'no-store' })
+  .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+  .then(function (html) {
+    if (html.indexOf('</head>') < 0) throw new Error('bad page');
+    var inj = '<script>window.AV_EXEC=' + JSON.stringify(EXEC) + ';<\/script>' +
+      '<link rel="apple-touch-icon" href="icon-180.png"><link rel="manifest" href="manifest.json">' +
+      '<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="An Việt ERP">';
+    html = html.replace(/<head(\s[^>]*)?>/i, function (m) { return m + inj; });
+    if (html.indexOf('name="viewport"') < 0) html = html.replace('</head>', '<meta name="viewport" content="width=device-width, initial-scale=1"></head>');
+    document.open(); document.write(html); document.close();
+  })
+  .catch(fail);
+</script>
+</body>
+</html>

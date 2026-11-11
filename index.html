@@ -65,9 +65,21 @@ function show(html) {
   if (html.indexOf('name="viewport"') < 0) html = html.replace('</head>', '<meta name="viewport" content="width=device-width, initial-scale=1"></head>');
   document.open(); document.write(html); document.close();
 }
+/* Có bản mới (đã tải ngầm xong): hiện nút cập nhật thay vì bắt người dùng mở lại lần nữa */
+function notify() {
+  try {
+    var d = document.createElement('div');
+    d.id = 'av-upd';
+    d.setAttribute('role', 'status');
+    d.style.cssText = 'position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:2147483000;background:#0B1F44;color:#fff;font:600 14px system-ui,sans-serif;padding:10px 12px 10px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.3);display:flex;gap:12px;align-items:center;max-width:calc(100vw - 32px)';
+    d.innerHTML = '<span>Đã có bản cập nhật phần mềm</span><button style="all:unset;cursor:pointer;background:#C9A766;color:#0B1F44;padding:7px 12px;border-radius:8px;font-weight:700">Cập nhật ngay</button>';
+    d.querySelector('button').onclick = function () { location.reload(); };
+    (document.body || document.documentElement).appendChild(d);
+  } catch (e) { }
+}
 cached().then(function (old) {
   if (old) {
-    fresh().then(function (h) { if (ver(h) !== ver(old)) return keep(h); }).catch(function () { });
+    fresh().then(function (h) { if (ver(h) !== ver(old)) return keep(h).then(notify); }).catch(function () { });
     show(old);
   } else {
     fresh().then(function (h) { keep(h); show(h); }).catch(fail);
